@@ -1,0 +1,25 @@
+server:
+  port: 8081
+  servlet:
+    session:
+      timeout: 60000
+spring:
+  config:
+    activate:
+      on-profile: local
+  data:
+    redis:
+      host: localhost
+      port: 6379
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/mine
+    username: root
+    password: test1234!test
+  kafka:
+    producer:
+      bootstrap-servers: localhost:9092
+    consumer:
+      bootstrap-servers: localhost:9092
+      group-id: group-song
+      auto-offset-reset: latest
