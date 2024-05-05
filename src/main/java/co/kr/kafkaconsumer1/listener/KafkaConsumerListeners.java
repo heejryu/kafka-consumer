@@ -18,11 +18,15 @@ public class KafkaConsumerListeners {
                     , containerFactory = "kafkaListenerContainerFactory")
     public void getSongTopic(@Headers MessageHeaders messageHeaders
                                   ,ConsumerRecord<String,Object> record, Acknowledgment acknowledgment) throws Exception{
-        log.info("[songTopicListener] START, record: {}", record.value());
-        log.info("messageHeaders ::: {}", messageHeaders.toString());
+        log.info("[songTopicListener] START");
+        log.info("record.value ? {}", record.value());
+        log.info("record.key ? {}", record.key());
+        log.info("record.offset ? {}", record.offset());
+        log.info("record.partition ? {}", record.partition());
 
         //TODO 필요한 로직 추가
 
+        //수동커밋
         acknowledgment.acknowledge();
         log.info("[songTopicListener] END");
     }

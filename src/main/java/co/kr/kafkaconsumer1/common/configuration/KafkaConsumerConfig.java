@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
+import org.springframework.kafka.listener.ContainerProperties;
 import org.springframework.kafka.listener.DefaultErrorHandler;
 import org.springframework.kafka.support.serializer.DeserializationException;
 import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer;
@@ -50,24 +51,22 @@ public class KafkaConsumerConfig {
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, ErrorHandlingDeserializer.class);
         props.put(ErrorHandlingDeserializer.KEY_DESERIALIZER_CLASS,StringDeserializer.class);
         props.put(ErrorHandlingDeserializer.VALUE_DESERIALIZER_CLASS, JsonDeserializer.class);
-        // (default: read_uncommitted) 커밋된 데이터만 읽는다.
-        props.put(ConsumerConfig.ISOLATION_LEVEL_CONFIG, "read_committed");
-        // 작업 중간에 에러가 발생하면 그 때의 offset 부터 다시 읽어야 하는데 자동적으로 커밋을 해버리니까 다음콜을 했을 때 이미 이전꺼는 commit 이 되버렸기 때문에 메세지가 유실될 위험이 있다.
+
         props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
+        // (default: read_uncommitted) 커밋된 데이터만 읽는다.
+//        props.put(ConsumerConfig.ISOLATION_LEVEL_CONFIG, "read_committed");
+        // 작업 중간에 에러가 발생하면 그 때의 offset 부터 다시 읽어야 하는데 자동적으로 커밋을 해버리니까 다음콜을 했을 때 이미 이전꺼는 commit 이 되버렸기 때문에 메세지가 유실될 위험이 있다.
+//        props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
 
         return props;
     }
 
-    /**
-     * KafkaMessageListenerContainer : Single thread topic이 여러개고 partition이 여러개여도 한번에 1개의 record를 처리
-     * -> 처리 속도가 느리다.
-     * ConcurrentMessageListenerContainer : Mulit thread topic이 여러개고 partition이 여러개여도 병렬적으로 record를 처리
-     * -> 처리 속도가 빠르다(kafka를 사용하는 이유)
-     */
     @Bean
     public ConcurrentKafkaListenerContainerFactory<String,Object> kafkaListenerContainerFactory() {
         ConcurrentKafkaListenerContainerFactory<String, Object> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory());
+        factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL_IMMEDIATE); // AckMode를 MANUAL_IMMEDIATE로 설정
+
         /**
          * (default FixedBackOff(0L, 9))1초 백오프를 사용하여 최대 2회(3회 전달 시도) 전달을 재시도. 실패는 재시도가 소진된 후에만 기록
          */

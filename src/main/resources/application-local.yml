@@ -1,5 +1,5 @@
 server:
-  port: 8081
+  port: 808
   servlet:
     session:
       timeout: 60000
@@ -15,11 +15,9 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/mine
     username: root
-    password: test1234!test
+    password: rootpwd
   kafka:
-    producer:
-      bootstrap-servers: localhost:9092
     consumer:
       bootstrap-servers: localhost:9092
-      group-id: group-song
+      group-id: song-group
       auto-offset-reset: latest
